@@ -6,18 +6,6 @@ import time
 SSID     = "A35Y"
 PASSWORD = "1nf0rm4l"
 
-# IP fixo do Pico W na rede. Garante que o app/servidor sempre achem o mesmo
-# endereco (sem depender do DHCP, que pode mudar a cada reboot).
-# AJUSTE para a sua rede:
-#   STATIC_IP -> um IP livre dentro da faixa do roteador
-#   GATEWAY   -> o IP do roteador (ex.: 192.168.15.1)
-#   SUBNET    -> mascara da rede (normalmente 255.255.255.0)
-#   DNS       -> pode usar o proprio gateway ou um DNS publico (ex.: 8.8.8.8)
-STATIC_IP = "192.168.15.50"
-SUBNET    = "255.255.255.0"
-GATEWAY   = "192.168.15.1"
-DNS       = "8.8.8.8"
-
 # LED no GP0
 led = machine.Pin(0, machine.Pin.OUT)
 led.off()
@@ -51,8 +39,6 @@ fechar_porta()
 # Conecta ao WiFi
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
-# Define o IP fixo ANTES de conectar (precisa estar com a interface ativa).
-wlan.ifconfig((STATIC_IP, SUBNET, GATEWAY, DNS))
 wlan.connect(SSID, PASSWORD)
 
 print("Conectando ao WiFi...")
