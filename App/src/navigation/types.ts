@@ -7,4 +7,5 @@ export type RootStackParamList = {
   EntityList: { entity: EntityKey };
   EntityForm: { entity: EntityKey; id?: number };
   Grupo: undefined;
+  Controle: undefined;
 };

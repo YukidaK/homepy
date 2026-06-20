@@ -13,10 +13,11 @@ type Props = NativeStackScreenProps<RootStackParamList, "Menu">;
 type IconName = keyof typeof Ionicons.glyphMap;
 type Item =
   | { icon: IconName; label: string; entity: EntityKey }
-  | { icon: IconName; label: string; route: "Grupo" }
+  | { icon: IconName; label: string; route: "Grupo" | "Controle" }
   | { icon: IconName; label: string; action: "logout" };
 
 const ITEMS: Item[] = [
+  { icon: "bulb-outline", label: "Controle", route: "Controle" },
   { icon: "hardware-chip-outline", label: "Dispositivos", entity: "dispositivos" },
   { icon: "home-outline", label: "Casas", entity: "casas" },
   { icon: "people-outline", label: "Clientes", entity: "clientes" },
