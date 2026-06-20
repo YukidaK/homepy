@@ -2,6 +2,7 @@
 // Fornece: autenticação (login), CRUD das 4 entidades e a rota que liga/desliga
 // o LED físico no Pico W/Arduino (integração demonstrada no vídeo da prova).
 
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const db = require("./db");
@@ -14,7 +15,7 @@ const PORT = process.env.PORT || 3000;
 
 // IP do Pico W / Arduino que controla o LED.
 // Ajuste para o IP do seu microcontrolador na rede onde o vídeo será gravado.
-const PICO_IP = process.env.PICO_IP || "192.168.15.50";
+const PICO_IP = process.env.PICO_IP || "10.183.183.114";
 
 // Pool MySQL — preenchido em db.init() antes do servidor subir.
 let pool;
@@ -182,6 +183,40 @@ app.post("/dispositivos/:id/led", async (req, res) => {
     ]);
 
     // Repassa o comando ao hardware (não derruba a resposta se o Pico estiver offline)
+    let hardware = "ok";
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      await fetch(`http://${PICO_IP}/${endpoint}`, { signal: controller.signal });
+      clearTimeout(timeout);
+    } catch {
+      hardware = "sem-conexao";
+    }
+
+    res.json({ id: Number(req.params.id), status: novoStatus, hardware });
+  } catch (e) {
+    res.status(500).json({ erro: e.message });
+  }
+});
+
+// Integração com a cortina do Pico W
+app.post("/dispositivos/:id/door", async (req, res) => {
+  const { open } = req.body || {};
+  try {
+    const [rows] = await pool.execute(
+      "SELECT * FROM dispositivos WHERE id_dispositivos = ?",
+      [req.params.id]
+    );
+    if (!rows[0]) return res.status(404).json({ erro: "Dispositivo não encontrado." });
+
+    const novoStatus = open ? "Ativo" : "Inativo";
+    const endpoint = open ? "door/open" : "door/close";
+
+    await pool.execute("UPDATE dispositivos SET status = ? WHERE id_dispositivos = ?", [
+      novoStatus,
+      req.params.id,
+    ]);
+
     let hardware = "ok";
     try {
       const controller = new AbortController();

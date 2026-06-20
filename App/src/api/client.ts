@@ -6,7 +6,14 @@ import { API_URL } from "../config";
 import { handleOffline } from "../offline/db";
 import { setOffline } from "../offline/state";
 
+const useOfflineOnly = !API_URL?.trim();
+
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+  if (useOfflineOnly) {
+    const data = handleOffline<T>(method, path, body);
+    setOffline(true);
+    return data;
+  }
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 5000);
 
@@ -28,10 +35,21 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   clearTimeout(timeout);
 
   const text = await res.text();
-  const parsed = text ? JSON.parse(text) : null;
+  let parsed: any = null;
+  try {
+    parsed = text ? JSON.parse(text) : null;
+  } catch {
+    const data = handleOffline<T>(method, path, body);
+    setOffline(true);
+    return data;
+  }
 
   if (!res.ok) {
-    // Resposta real do servidor (ex.: login inválido) -> propaga o erro.
+    if (res.status >= 500) {
+      const data = handleOffline<T>(method, path, body);
+      setOffline(true);
+      return data;
+    }
     throw new Error((parsed && parsed.erro) || "Erro na requisição.");
   }
 

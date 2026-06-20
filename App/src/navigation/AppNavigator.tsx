@@ -10,6 +10,7 @@ import MenuScreen from "../screens/MenuScreen";
 import GrupoScreen from "../screens/GrupoScreen";
 import EntityListScreen from "../screens/EntityListScreen";
 import EntityFormScreen from "../screens/EntityFormScreen";
+import ControleScreen from "../screens/ControleScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -36,6 +37,7 @@ export default function AppNavigator() {
           />
           <Stack.Screen name="EntityForm" component={EntityFormScreen} options={{ title: "Formulário" }} />
           <Stack.Screen name="Grupo" component={GrupoScreen} options={{ title: "Grupo" }} />
+          <Stack.Screen name="Controle" component={ControleScreen} options={{ title: "Controle" }} />
         </>
       )}
     </Stack.Navigator>
